@@ -1,0 +1,102 @@
+<!-- Simple header -->
+<header>
+          <h1><span class="u-icon"><svg class="u-svg-content" viewBox="0 0 52.966 52.966" x="0px" y="0px" style="width: 1em; height: 1em;"><path d="M51.704,51.273L36.845,35.82c3.79-3.801,6.138-9.041,6.138-14.82c0-11.58-9.42-21-21-21s-21,9.42-21,21s9.42,21,21,21
+          c5.083,0,9.748-1.817,13.384-4.832l14.895,15.491c0.196,0.205,0.458,0.307,0.721,0.307c0.25,0,0.499-0.093,0.693-0.279
+          C52.074,52.304,52.086,51.671,51.704,51.273z M21.983,40c-10.477,0-19-8.523-19-19s8.523-19,19-19s19,8.523,19,19
+          S32.459,40,21.983,40z"></path></svg><img></span>&nbsp;Searcher 
+          </h1>
+</header>
+
+
+
+<!-- Form generate -->
+<div class = 'form-div'>
+    <%= form_for :message, url: "/search", method: "post", remote: true do |form| %>
+    <%= form.hidden_field :authenticity_token, value: form_authenticity_token %>
+    <p>
+        <%= form.label :Include_Name%>
+        <%= form.text_field :input_include_name %>
+    </p>
+    <p>
+        <%= form.label :Exclude_Name %>
+        <%= form.text_field :input_exclude_name %>
+    </p>
+    <p>
+        <%= form.label :Include_Type %>
+        <%= form.text_field :input_include_type %>
+    </p>
+    <p>
+        <%= form.label :Exclude_Type %>
+        <%= form.text_field :input_exclude_type %>
+    </p> 
+    <p>
+        <%= form.label :Designed_By %>
+        <%= form.text_field :input_designed_by %>
+    </p>
+    <p>
+        <%= form.label :Not_Designed_By %>
+        <%= form.text_field :input_not_designed_by %>
+    </p>     
+    <p>
+        <%= form.submit "Send Rules", class: "button-27"%>
+    </p>
+<% end %>
+</div>
+
+
+
+
+
+
+<!-- Include jQuery library -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Add JavaScript to handle form submission and AJAX request -->
+<script>
+    $(document).ready(function() {
+    $('form').submit(function(event) {
+        event.preventDefault();
+        var csrfToken = $('meta[name="csrf-token"]').attr('content');
+        $.ajax({
+        type: "POST",
+        url: "/search",
+        data: $(this).serialize(),
+        headers: { 'X-CSRF-Token': csrfToken },
+        success: function(response) {
+            var table = $('#results-table tbody');
+            var tbody = document.getElementById("results-tbody");
+            tbody .innerHTML = "";
+            $.each(response, function(index,message) {
+                for (let i in message) {
+                    var row = $('<tr>');
+                    var nameCell = $('<td>').text(message[i]['Name']);
+                    var typeCell = $('<td>').text(message[i]['Type']);
+                    var designedCell = $('<td>').text(message[i]['Designed by']);
+
+                    row.append(nameCell);
+                    row.append(typeCell);
+                    row.append(designedCell);
+
+                    table.append(row);
+                }  
+            });
+        }
+        });
+    });
+    });
+</script>
+
+<!-- Results -->
+<table id="results-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Designed by</th>
+    </tr>
+  </thead>
+  <tbody id="results-tbody">
+  </tbody>
+</table>
+
+
