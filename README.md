@@ -7,7 +7,7 @@
 * Data json location: /storage/data.json
 
 * How to run 
-- Start project by "rails s" or "rails server"
+- Start project by "rails s" or "rails server" or visit https://teamvoy-test-task.onrender.com/
 
 - Input rules in the following text areas and press "Save Rules" button
 
