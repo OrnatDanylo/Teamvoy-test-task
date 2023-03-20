@@ -1,9 +1,9 @@
 class SearchController < ApplicationController
     def index
-        
+        json_data_read
     end 
     
-    def create
+    def new
         if params[:message].present?
           message = params[:message]
           edited_message = find_message(message)
@@ -15,9 +15,12 @@ class SearchController < ApplicationController
 
     private 
 
-    def find_message(rules)
+    def json_data_read 
         data_file_path = Rails.root.join('public', 'data.json')
-        json_data = JSON.parse(File.read(data_file_path).encode('UTF-8', 'Windows-1251'))
+        $json_data = JSON.parse(File.read(data_file_path).encode('UTF-8', 'Windows-1251'))
+    end       
+
+    def find_message(rules)
         #Get rules
         include_name = rules['input_include_name'].split(", ")
         exclude_name = rules['input_exclude_name'].split(", ")
@@ -25,31 +28,41 @@ class SearchController < ApplicationController
         exclude_type = rules['input_exclude_type'].split(", ")
         designed_by = rules['input_designed_by'].split(", ")
         not_designed_by = rules['input_not_designed_by'].split(", ")
+        
         #filter
-        filtered_items = json_data.select { |item|
-            (if include_name.empty?
-                true
-            else #name include filter
-                include_name.all? { |rule| item['Name'].split(", ").any? {|check| check.downcase == (rule.downcase)}}
-            end &&
-            if include_type.empty?
-                true
-            else #type include filter
-                include_type.all? { |rule| item['Type'].split(", ").any? {|check| check.downcase == (rule.downcase)}}
-            end &&
-            if designed_by.empty?
-                true
-            else #designed by filter
-                designed_by.all? { |rule| item['Designed by'].split(", ").any? {|check| check.downcase == (rule.downcase)}}
-            end)&&(
-                #exclude filter
-                !exclude_name.any? { |rule| item['Name'].split(", ").any? {|check| check.downcase == (rule.downcase)}} &&
-                !exclude_type.any? { |rule| item['Type'].split(", ").any? {|check| check.downcase == (rule.downcase)}} &&
-                !not_designed_by.any? { |rule| item['Designed by'].split(", ").any? {|check| check.downcase == (rule.downcase)}}        
-            ) 
-        }
+        filtered_items = $json_data.select do |item|
+            filter?(include_name,exclude_name,designed_by,exclude_name,exclude_type,not_designed_by,item)
+        end
+
         return filtered_items
     end  
 
-      
+    def filter?(include_name,exclude_name,designed_by,exclude_name,exclude_type,not_designed_by,item)
+        include_rules?(include_name,exclude_name,designed_by,item) && 
+        exclude_rules?(exclude_name,exclude_type,not_designed_by,item)
+    end
+
+    def include_rules?(name,type,designed_by,item)
+        include_rule?(name,'Name',item) && 
+        include_rule?(type,'Type',item) && 
+        include_rule?(designed_by,'Designed by',item)
+    end
+
+    def exclude_rules?(name,type,designed_by,item)
+        exclude_rule?(name,'Name',item) && 
+        exclude_rule?(type,'Type',item) && 
+        exclude_rule?(designed_by,'Designed by',item)
+    end
+
+    def include_rule?(include_parameter,parameter_name,item) 
+        if include_parameter.empty?
+            true
+        else #include filter
+            include_parameter.all? { |rule| item[parameter_name].split(", ").any? {|check| check.downcase == (rule.downcase)}}
+        end  
+    end      
+
+    def exclude_rule?(exclude_parameter,parameter_name,item) 
+        !exclude_parameter.any? { |rule| item[parameter_name].split(", ").any? {|check| check.downcase == (rule.downcase)}}
+    end   
 end

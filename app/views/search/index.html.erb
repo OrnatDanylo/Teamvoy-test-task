@@ -58,8 +58,8 @@
         event.preventDefault();
         var csrfToken = $('meta[name="csrf-token"]').attr('content');
         $.ajax({
-        type: "POST",
-        url: "/search",
+        type: "GET",
+        url: "/search/new",
         data: $(this).serialize(),
         headers: { 'X-CSRF-Token': csrfToken },
         success: function(response) {
