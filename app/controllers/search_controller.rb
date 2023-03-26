@@ -1,4 +1,6 @@
 class SearchController < ApplicationController
+    include SearchFilter
+
     def index
         json_data_read
     end 
@@ -34,35 +36,6 @@ class SearchController < ApplicationController
             filter?(include_name,exclude_name,designed_by,exclude_name,exclude_type,not_designed_by,item)
         end
 
-        return filtered_items
-    end  
-
-    def filter?(include_name,exclude_name,designed_by,exclude_name,exclude_type,not_designed_by,item)
-        include_rules?(include_name,exclude_name,designed_by,item) && 
-        exclude_rules?(exclude_name,exclude_type,not_designed_by,item)
-    end
-
-    def include_rules?(name,type,designed_by,item)
-        include_rule?(name,'Name',item) && 
-        include_rule?(type,'Type',item) && 
-        include_rule?(designed_by,'Designed by',item)
-    end
-
-    def exclude_rules?(name,type,designed_by,item)
-        exclude_rule?(name,'Name',item) && 
-        exclude_rule?(type,'Type',item) && 
-        exclude_rule?(designed_by,'Designed by',item)
-    end
-
-    def include_rule?(include_parameter,parameter_name,item) 
-        if include_parameter.empty?
-            true
-        else #include filter
-            include_parameter.all? { |rule| item[parameter_name].split(", ").any? {|check| check.downcase == (rule.downcase)}}
-        end  
-    end      
-
-    def exclude_rule?(exclude_parameter,parameter_name,item) 
-        !exclude_parameter.any? { |rule| item[parameter_name].split(", ").any? {|check| check.downcase == (rule.downcase)}}
-    end   
+        filtered_items
+    end     
 end

@@ -11,7 +11,7 @@
 
 <!-- Form generate -->
 <div class = 'form-div'>
-    <%= form_for :message, url: "/search", method: "post", remote: true do |form| %>
+    <%= form_for :message, url: "/search/new", method: "GET", remote: true do |form| %>
     <%= form.hidden_field :authenticity_token, value: form_authenticity_token %>
     <p>
         <%= form.label :Include_Name%>
