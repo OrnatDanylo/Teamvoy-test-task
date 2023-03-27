@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
   root 'search#index'
 
-  get 'search' => 'search#new'
+  get 'search/new' => 'search#new'
 end
