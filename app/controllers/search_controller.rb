@@ -33,7 +33,7 @@ class SearchController < ApplicationController
         
         #filter
         filtered_items = $json_data.select do |item|
-            filter?(include_name,exclude_name,designed_by,exclude_name,exclude_type,not_designed_by,item)
+            filter?(include_name,include_type,designed_by,exclude_name,exclude_type,not_designed_by,item)
         end
 
         filtered_items
