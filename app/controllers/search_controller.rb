@@ -3,7 +3,7 @@ class SearchController < ApplicationController
         
     end 
     
-    def create
+    def new
         if params[:message].present?
           message = params[:message]
           edited_message = find_message(message)
@@ -26,30 +26,11 @@ class SearchController < ApplicationController
         designed_by = rules['input_designed_by'].split(", ")
         not_designed_by = rules['input_not_designed_by'].split(", ")
         #filter
-        filtered_items = json_data.select { |item|
-            (if include_name.empty?
-                true
-            else #name include filter
-                include_name.all? { |rule| item['Name'].split(", ").any? {|check| check.downcase == (rule.downcase)}}
-            end &&
-            if include_type.empty?
-                true
-            else #type include filter
-                include_type.all? { |rule| item['Type'].split(", ").any? {|check| check.downcase == (rule.downcase)}}
-            end &&
-            if designed_by.empty?
-                true
-            else #designed by filter
-                designed_by.all? { |rule| item['Designed by'].split(", ").any? {|check| check.downcase == (rule.downcase)}}
-            end)&&(
-                #exclude filter
-                !exclude_name.any? { |rule| item['Name'].split(", ").any? {|check| check.downcase == (rule.downcase)}} &&
-                !exclude_type.any? { |rule| item['Type'].split(", ").any? {|check| check.downcase == (rule.downcase)}} &&
-                !not_designed_by.any? { |rule| item['Designed by'].split(", ").any? {|check| check.downcase == (rule.downcase)}}        
-            ) 
-        }
-        return filtered_items
+        filtered_items = $json_data.select do |item|
+            filter?(include_name,include_type,designed_by,exclude_name,exclude_type,not_designed_by,item)
+        end
+
+        filtered_items
     end  
 
-      
 end
